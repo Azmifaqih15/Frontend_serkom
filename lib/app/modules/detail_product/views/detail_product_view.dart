@@ -318,6 +318,49 @@ class DetailProductView extends GetView<DetailProductController> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  // Stock Status Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: controller.product.stock > 0 
+                          ? const Color(0xFFECFDF5) 
+                          : const Color(0xFFFEF2F2),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: controller.product.stock > 0 
+                            ? const Color(0xFFA7F3D0) 
+                            : const Color(0xFFFECACA),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          controller.product.stock > 0 
+                              ? Icons.inventory_2_outlined 
+                              : Icons.production_quantity_limits_rounded,
+                          size: 16,
+                          color: controller.product.stock > 0 
+                              ? const Color(0xFF065F46) 
+                              : const Color(0xFF991B1B),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          controller.product.stock > 0 
+                              ? 'Stok Tersedia: ${controller.product.stock} unit' 
+                              : 'Stok Habis',
+                          style: GoogleFonts.outfit(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: controller.product.stock > 0 
+                                ? const Color(0xFF065F46) 
+                                : const Color(0xFF991B1B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   // Description
                   Text(

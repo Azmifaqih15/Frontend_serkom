@@ -4,15 +4,26 @@ import 'package:get/get.dart';
 class ApiService extends GetConnect {
   String? tokenVal;
 
-  // Menggunakan USB Debugging via adb reverse tcp:8000 tcp:8000 (Sangat stabil & anti-gagal)
-  static const String serverIp = '127.0.0.1'; 
+  // Menggunakan USB Cable (adb reverse tcp:8000 tcp:8000) -> 100% Terhubung & Bebas Block Firewall!
+  static final RxString currentServerIp = '127.0.0.1'.obs; 
 
   String get baseUrlString {
     if (kIsWeb) return 'http://localhost:8000';
     if (GetPlatform.isAndroid) {
-      return 'http://$serverIp:8000';
+      return 'http://${currentServerIp.value}:8000';
     }
     return 'http://localhost:8000';
+  }
+
+  void updateServerIp(String newIp) {
+    var cleanIp = newIp.trim().replaceAll('http://', '').replaceAll('https://', '');
+    if (cleanIp.contains(':')) {
+      cleanIp = cleanIp.split(':').first;
+    }
+    if (cleanIp.isNotEmpty) {
+      currentServerIp.value = cleanIp;
+      httpClient.baseUrl = baseUrlString;
+    }
   }
 
   @override
@@ -52,14 +63,22 @@ class ApiService extends GetConnect {
   }
 
   Future<Response> getProfile() {
-    return get('/auth/me');
+    final headers = <String, String>{};
+    if (tokenVal != null && tokenVal!.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $tokenVal';
+    }
+    return get('/auth/me', headers: headers);
   }
 
   Future<Response> updateProfile(String name, String phone) {
+    final headers = <String, String>{};
+    if (tokenVal != null && tokenVal!.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $tokenVal';
+    }
     return put('/auth/me', {
       'name': name,
       'phone': phone,
-    });
+    }, headers: headers);
   }
 
   // ----------------- PRODUCT ENDPOINTS -----------------

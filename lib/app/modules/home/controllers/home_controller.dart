@@ -11,6 +11,7 @@ class Product {
   final String imageUrl;
   final String category;
   final double rating;
+  final int stock;
 
   Product({
     required this.id,
@@ -19,6 +20,7 @@ class Product {
     required this.imageUrl,
     required this.category,
     this.rating = 4.8,
+    this.stock = 50,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class Product {
       imageUrl: json['image_url'] ?? '',
       category: json['category'] ?? '',
       rating: json['rating'] != null ? parseDouble(json['rating']) : 4.8,
+      stock: json['stock'] ?? 50,
     );
   }
 }
@@ -183,6 +186,7 @@ class HomeController extends GetxController {
   final RxInt currentTabIndex = 0.obs;
   final RxString selectedCategory = 'Semua'.obs;
   final RxString searchQuery = ''.obs;
+  final RxString cariSearchQuery = ''.obs;
   final searchController = TextEditingController();
 
   final List<String> categories = [
@@ -350,6 +354,8 @@ class HomeController extends GetxController {
   void changeTab(int index) {
     currentTabIndex.value = index;
     if (index == 0) {
+      searchQuery.value = '';
+      searchController.clear();
       fetchProducts();
     } else if (index == 2 && !_authService.isGuest) {
       fetchCart();
@@ -358,10 +364,16 @@ class HomeController extends GetxController {
 
   void selectCategory(String category) {
     selectedCategory.value = category;
+    searchQuery.value = '';
+    searchController.clear();
   }
 
   void updateSearchQuery(String query) {
     searchQuery.value = query;
+  }
+
+  void updateCariSearchQuery(String query) {
+    cariSearchQuery.value = query;
   }
 
   // Cart calculation helpers (only for selected items)

@@ -4,10 +4,125 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../data/colors.dart';
+import '../../../data/services/api_service.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
   const LoginView({super.key});
+
+  void _showIpSettingsDialog(BuildContext context) {
+    final apiService = Get.find<ApiService>();
+    final ipController = TextEditingController(text: ApiService.currentServerIp.value);
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.container,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.dns_rounded, color: AppColors.accent, size: 24),
+            const SizedBox(width: 10),
+            Text(
+              'Pengaturan IP Server',
+              style: GoogleFonts.outfit(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Jika IP Wi-Fi laptop berubah, pilih atau ketik IP baru di bawah ini:',
+              style: GoogleFonts.outfit(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: ipController,
+              keyboardType: TextInputType.url,
+              style: GoogleFonts.outfit(fontSize: 15, color: AppColors.textPrimary),
+              decoration: InputDecoration(
+                hintText: 'Misal: 192.168.1.100',
+                hintStyle: GoogleFonts.outfit(color: AppColors.fieldHint),
+                prefixIcon: const Icon(Icons.wifi_rounded, color: AppColors.accent, size: 20),
+                filled: true,
+                fillColor: AppColors.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Pilihan Cepat:',
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ActionChip(
+                  label: Text('192.168.1.100 (Wi-Fi)', style: GoogleFonts.outfit(fontSize: 12, color: AppColors.textPrimary)),
+                  backgroundColor: AppColors.background,
+                  onPressed: () => ipController.text = '192.168.1.100',
+                ),
+                ActionChip(
+                  label: Text('127.0.0.1 (USB Cable)', style: GoogleFonts.outfit(fontSize: 12, color: AppColors.textPrimary)),
+                  backgroundColor: AppColors.background,
+                  onPressed: () => ipController.text = '127.0.0.1',
+                ),
+                ActionChip(
+                  label: Text('10.0.2.2 (Emulator)', style: GoogleFonts.outfit(fontSize: 12, color: AppColors.textPrimary)),
+                  backgroundColor: AppColors.background,
+                  onPressed: () => ipController.text = '10.0.2.2',
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Batal', style: GoogleFonts.outfit(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.buttonPrimary,
+              foregroundColor: AppColors.buttonTextPrimary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () {
+              apiService.updateServerIp(ipController.text);
+              Get.back();
+              Get.snackbar(
+                'IP Server Diperbarui',
+                'Server terhubung ke http://${ApiService.currentServerIp.value}:8000',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: const Color(0xFFECFDF5),
+                colorText: const Color(0xFF065F46),
+              );
+            },
+            child: Text('Simpan IP', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +133,48 @@ class LoginView extends GetView<LoginController> {
           physics: const ClampingScrollPhysics(),
           child: Column(
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 12),
+              // Server IP Status Chip
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    InkWell(
+                      onTap: () => _showIpSettingsDialog(context),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.container,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.border, width: 1),
+                        ),
+                        child: Obx(
+                          () => Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.wifi_rounded, size: 14, color: AppColors.accent),
+                              const SizedBox(width: 6),
+                              Text(
+                                ApiService.currentServerIp.value,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(Icons.edit_rounded, size: 12, color: AppColors.textSecondary),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
               // Header Section
               Center(
                 child: Column(

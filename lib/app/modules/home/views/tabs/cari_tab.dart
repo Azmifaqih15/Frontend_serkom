@@ -50,7 +50,7 @@ class CariTab extends GetView<HomeController> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: TextField(
-                onChanged: controller.updateSearchQuery,
+                onChanged: controller.updateCariSearchQuery,
                 style: GoogleFonts.outfit(fontSize: 15, color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'Masukkan kata kunci...',
@@ -76,7 +76,7 @@ class CariTab extends GetView<HomeController> {
           // Search Results
           Expanded(
             child: Obx(() {
-              final query = controller.searchQuery.value.trim();
+              final query = controller.cariSearchQuery.value.trim();
               if (query.isEmpty) {
                 return Center(
                   child: Column(

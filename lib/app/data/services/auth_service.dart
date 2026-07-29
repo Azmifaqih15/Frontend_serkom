@@ -59,9 +59,21 @@ class AuthService extends GetxService {
         if (userResponse.status.isOk && userResponse.body != null) {
           currentUser.value = UserModel.fromJson(userResponse.body);
           return {'success': true};
+        } else {
+          final detail = userResponse.body != null && userResponse.body['detail'] != null
+              ? userResponse.body['detail']
+              : 'Gagal mengambil profil (${userResponse.statusCode})';
+          return {'success': false, 'message': detail};
         }
       }
       
+      if (response.statusCode == null) {
+        return {
+          'success': false,
+          'message': 'Gagal terhubung ke server (Port 8000 tidak terjangkau). Silakan periksa IP Server.'
+        };
+      }
+
       final detail = response.body != null && response.body['detail'] != null
           ? response.body['detail']
           : 'Email atau password salah';

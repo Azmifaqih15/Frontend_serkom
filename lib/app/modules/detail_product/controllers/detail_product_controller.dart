@@ -84,6 +84,16 @@ class DetailProductController extends GetxController {
   }
 
   Future<void> addToCart() async {
+    if (product.stock <= 0) {
+      Get.snackbar(
+        'Stok Habis',
+        'Maaf, produk ini sedang tidak tersedia.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFFEF2F2),
+        colorText: const Color(0xFF991B1B),
+      );
+      return;
+    }
     try {
       final homeController = Get.find<HomeController>();
       final size = sizes[selectedSizeIndex.value];
@@ -95,6 +105,16 @@ class DetailProductController extends GetxController {
   }
 
   Future<void> buyNow() async {
+    if (product.stock <= 0) {
+      Get.snackbar(
+        'Stok Habis',
+        'Maaf, produk ini sedang tidak tersedia.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFFEF2F2),
+        colorText: const Color(0xFF991B1B),
+      );
+      return;
+    }
     try {
       final homeController = Get.find<HomeController>();
       // Uncheck all other items in cart first so only the current product is checked out
